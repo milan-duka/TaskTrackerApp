@@ -7,7 +7,7 @@ public class ProjectTaskDto
     public string Description { get; set; }
     public int Priority { get; set; }
 
-    public int? ProjectID { get; set; }
+    public int ProjectID { get; set; }
     public virtual ProjectDto Project { get; set; }
 }
 
