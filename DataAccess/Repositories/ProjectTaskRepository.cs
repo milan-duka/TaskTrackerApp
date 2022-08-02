@@ -1,5 +1,6 @@
 ﻿using DataAccess.Interfaces;
 using DataAccess.Models;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,33 +10,60 @@ using System.Threading.Tasks;
 namespace DataAccess.Repositories;
 public class ProjectTaskRepository : IProjectTaskRepository
 {
-    public ProjectTaskRepository()
+    private readonly TaskTrackerContext _taskTrackerContext;
+    public ProjectTaskRepository(TaskTrackerContext taskTrackerContext)
     {
-
+        _taskTrackerContext = taskTrackerContext;
     }
-    public Task<ProjectTaskDto> AddProjectTaskAsync(ProjectTaskDto projectTask)
+    public async Task<ProjectTaskDto> AddProjectTaskAsync(ProjectTaskDto projectTask)
     {
-        throw new NotImplementedException();
-    }
+        var result = await _taskTrackerContext.ProjectTasks.AddAsync(projectTask);
 
-    public Task DeleteProjectTaskAsync(int projectTaskId)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<ProjectTaskDto> GetProjectTaskAsync(int projectTaskId)
-    {
-        throw new NotImplementedException();
+        await _taskTrackerContext.SaveChangesAsync();
+        return result.Entity;
     }
 
-    public Task<IEnumerable<ProjectTaskDto>> GetProjectTasksAsync()
+    public async Task<ProjectTaskDto> GetProjectTaskAsync(int projectTaskId)
     {
-        throw new NotImplementedException();
+        return await _taskTrackerContext.ProjectTasks
+            .FindAsync(projectTaskId);
     }
 
-    public Task<ProjectTaskDto> UpdateProjectTaskAsync(ProjectTaskDto projectTask)
+    public async Task<IEnumerable<ProjectTaskDto>> GetProjectTasksAsync()
     {
-        throw new NotImplementedException();
+        return await _taskTrackerContext.ProjectTasks.ToListAsync();
+    }
+
+    public async Task<ProjectTaskDto> UpdateProjectTaskAsync(ProjectTaskDto projectTask)
+    {
+        var result = await _taskTrackerContext.ProjectTasks
+            .FindAsync(projectTask.ID);
+
+        if (result != null)
+        {
+            result.Name = projectTask.Name;
+            result.Status = projectTask.Status;
+            result.Description = projectTask.Description;
+            result.Priority = projectTask.Priority;
+            result.ProjectID = projectTask.ProjectID;
+
+            await _taskTrackerContext.SaveChangesAsync();
+
+            return result;
+        }
+
+        return null;
+    }
+
+    public async Task DeleteProjectTaskAsync(int projectTaskId)
+    {
+        var result = await _taskTrackerContext.ProjectTasks
+            .FindAsync(projectTaskId);
+        if (result != null)
+        {
+            _taskTrackerContext.ProjectTasks.Remove(result);
+            await _taskTrackerContext.SaveChangesAsync();
+        }
     }
 }
 

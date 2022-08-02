@@ -1,37 +1,64 @@
 ﻿using DataAccess.Interfaces;
 using DataAccess.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace DataAccess.Repositories;
 public class ProjectRepository : IProjectRepository
 {
-    public Task<ProjectDto> AddProjectAsync(ProjectDto project)
+    private readonly TaskTrackerContext _taskTrackerContext;
+    public ProjectRepository(TaskTrackerContext taskTrackerContext)
     {
-        throw new NotImplementedException();
+        _taskTrackerContext = taskTrackerContext;
+    }
+    public async Task<ProjectDto> AddProjectAsync(ProjectDto project)
+    {
+        var result = await _taskTrackerContext.AddAsync(project);
+
+        await _taskTrackerContext.SaveChangesAsync();
+        return result.Entity;
     }
 
-    public Task DeleteProjectAsync(int projectId)
+    public async Task<ProjectDto> GetProjectAsync(int projectId)
     {
-        throw new NotImplementedException();
+        return await _taskTrackerContext.Projects
+            .FindAsync(projectId);
     }
 
-    public Task<ProjectDto> GetProjectAsync(int projectId)
+    public async Task<IEnumerable<ProjectDto>> GetProjectsAsync()
     {
-        throw new NotImplementedException();
+        return await _taskTrackerContext.Projects.ToListAsync();
     }
 
-    public Task<IEnumerable<ProjectDto>> GetProjectsAsync()
+    public async Task<ProjectDto> UpdateProjectAsync(ProjectDto project)
     {
-        throw new NotImplementedException();
+        var result = await _taskTrackerContext.Projects
+            .FindAsync(project.ID);
+
+        if (result != null)
+        {
+            result.Name = project.Name;
+            result.StartDate = project.StartDate;
+            result.CompletionDate = project.CompletionDate;
+            result.Status = project.Status;
+            result.Priority = project.Priority;
+
+            await _taskTrackerContext.SaveChangesAsync();
+
+            return result;
+        }
+
+        return null;
     }
 
-    public Task<ProjectDto> UpdateProjectAsync(ProjectDto project)
+    public async Task DeleteProjectAsync(int projectId)
     {
-        throw new NotImplementedException();
+        var result = await _taskTrackerContext.Projects
+            .FirstOrDefaultAsync(p => p.ID == projectId);
+        if (result != null)
+        {
+            _taskTrackerContext.Projects.Remove(result);
+            await _taskTrackerContext.SaveChangesAsync();
+        }
     }
 }
 
