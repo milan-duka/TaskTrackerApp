@@ -1,4 +1,5 @@
-﻿using DataAccess.Interfaces;
+﻿using DataAccess.Data;
+using DataAccess.Interfaces;
 using DataAccess.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -37,7 +38,7 @@ public class ProjectTaskRepository : IProjectTaskRepository
     public async Task<ProjectTaskDto> UpdateProjectTaskAsync(ProjectTaskDto projectTask)
     {
         var result = await _taskTrackerContext.ProjectTasks
-            .FindAsync(projectTask.ID);
+            .FindAsync(projectTask.Id);
 
         if (result != null)
         {
@@ -45,7 +46,7 @@ public class ProjectTaskRepository : IProjectTaskRepository
             result.Status = projectTask.Status;
             result.Description = projectTask.Description;
             result.Priority = projectTask.Priority;
-            result.ProjectID = projectTask.ProjectID;
+            result.ProjectId = projectTask.ProjectId;
 
             await _taskTrackerContext.SaveChangesAsync();
 

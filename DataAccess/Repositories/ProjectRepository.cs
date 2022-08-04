@@ -1,4 +1,5 @@
-﻿using DataAccess.Interfaces;
+﻿using DataAccess.Data;
+using DataAccess.Interfaces;
 using DataAccess.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,8 +21,13 @@ public class ProjectRepository : IProjectRepository
 
     public async Task<ProjectDto> GetProjectAsync(int projectId)
     {
-        return await _taskTrackerContext.Projects
+        var result = await _taskTrackerContext.Projects
             .FindAsync(projectId);
+
+        if (result != null)
+            return result;
+        else
+            throw new Exception($"Project with Id: {projectId} not found!");
     }
 
     public async Task<IEnumerable<ProjectDto>> GetProjectsAsync()
@@ -32,28 +38,23 @@ public class ProjectRepository : IProjectRepository
     public async Task<ProjectDto> UpdateProjectAsync(ProjectDto project)
     {
         var result = await _taskTrackerContext.Projects
-            .FindAsync(project.ID);
+            .FindAsync(project.Id);
 
-        if (result != null)
+        if (project != null && result != null)
         {
-            result.Name = project.Name;
-            result.StartDate = project.StartDate;
-            result.CompletionDate = project.CompletionDate;
-            result.Status = project.Status;
-            result.Priority = project.Priority;
-
             await _taskTrackerContext.SaveChangesAsync();
 
-            return result;
+            return project;
         }
-
-        return null;
+        else
+            throw new Exception("Project is not updated because it is not found.");
     }
 
     public async Task DeleteProjectAsync(int projectId)
     {
         var result = await _taskTrackerContext.Projects
-            .FirstOrDefaultAsync(p => p.ID == projectId);
+            .FindAsync(projectId);
+
         if (result != null)
         {
             _taskTrackerContext.Projects.Remove(result);

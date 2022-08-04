@@ -1,6 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using DataAccess.Models;
+using Microsoft.EntityFrameworkCore;
 
-namespace DataAccess.Models;
+namespace DataAccess.Data;
 public class TaskTrackerContext : DbContext
 {
     public TaskTrackerContext(DbContextOptions<TaskTrackerContext> options) : base(options)
