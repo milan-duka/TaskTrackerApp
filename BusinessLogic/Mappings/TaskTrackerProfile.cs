@@ -8,8 +8,11 @@ public class TaskTrackerProfile : Profile
 {
     public TaskTrackerProfile()
     {
-        CreateMap<ProjectTaskDto, ProjectTaskModel>();
-        CreateMap<ProjectDto, ProjectModel>();
+        CreateMap<ProjectModel, ProjectDto>().ReverseMap();
+            //.ForMember(dest => dest.ProjectTasks, act => act.Ignore());
+        CreateMap<ProjectTaskModel, ProjectTaskDto>().ReverseMap()
+            .ForMember(dest => dest.Project, act => act.Ignore());
+        //.ForSourceMember(source => source.Project, o => o.DoNotValidate());
     }
 }
 

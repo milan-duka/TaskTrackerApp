@@ -86,17 +86,12 @@ namespace DataAccess.Migrations
             modelBuilder.Entity("DataAccess.Models.ProjectTaskDto", b =>
                 {
                     b.HasOne("DataAccess.Models.ProjectDto", "Project")
-                        .WithMany("ProjectTasks")
+                        .WithMany()
                         .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Project");
-                });
-
-            modelBuilder.Entity("DataAccess.Models.ProjectDto", b =>
-                {
-                    b.Navigation("ProjectTasks");
                 });
 #pragma warning restore 612, 618
         }

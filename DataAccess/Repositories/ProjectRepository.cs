@@ -37,11 +37,9 @@ public class ProjectRepository : IProjectRepository
 
     public async Task<ProjectDto> UpdateProjectAsync(ProjectDto project)
     {
-        var result = await _taskTrackerContext.Projects
-            .FindAsync(project.Id);
-
-        if (project != null && result != null)
+        if (project != null)
         {
+            _taskTrackerContext.Attach(project);
             await _taskTrackerContext.SaveChangesAsync();
 
             return project;
@@ -60,6 +58,18 @@ public class ProjectRepository : IProjectRepository
             _taskTrackerContext.Projects.Remove(result);
             await _taskTrackerContext.SaveChangesAsync();
         }
+    }
+
+    public async Task<bool> ProjectExistsAsync(int projectId)
+    {
+        var result = await _taskTrackerContext.Projects
+            .FindAsync(projectId);
+
+        if (result == null)
+            return false;
+
+        _taskTrackerContext.Entry(result).State = EntityState.Detached;
+        return true;
     }
 }
 

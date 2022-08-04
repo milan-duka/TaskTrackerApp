@@ -53,14 +53,14 @@ public class ProjectService : IProjectService
     {
         var projectDtos = await _projectRepository.GetProjectsAsync();
 
-        if (!projectDtos.Any())
-            throw new Exception("There doesn't exist any project.");
-
         var projects = new List<ProjectModel>();
 
-        foreach (var projectDto in projectDtos)
+        if (projectDtos.Any())
         {
-            projects.Add(_mapper.Map<ProjectModel>(projectDto));
+            foreach (var projectDto in projectDtos)
+            {
+                projects.Add(_mapper.Map<ProjectModel>(projectDto));
+            }
         }
 
         return projects;
@@ -68,8 +68,8 @@ public class ProjectService : IProjectService
 
     public async Task<ProjectModel> UpdateProjectAsync(int projectId, ProjectModel project)
     {
-        var existingProject = await GetProjectAsync(projectId);
-        if (existingProject == null)
+        var projectExist = await _projectRepository.ProjectExistsAsync(projectId);
+        if (!projectExist)
             throw new Exception($"Project with id {projectId} can't be updated because it is not found.");
 
         if (project == null)

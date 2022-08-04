@@ -8,5 +8,6 @@ public interface IProjectRepository
     Task<ProjectDto> GetProjectAsync(int projectId);
     Task<ProjectDto> UpdateProjectAsync(ProjectDto project);
     Task DeleteProjectAsync(int projectId);
+    Task<bool> ProjectExistsAsync(int projectId);
 }
 
