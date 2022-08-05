@@ -19,15 +19,15 @@ public class ProjectRepository : IProjectRepository
         return result.Entity;
     }
 
-    public async Task<ProjectDto> GetProjectAsync(int projectId)
+    public async Task<ProjectDto> GetProjectByIdAsync(int projectId)
     {
         var result = await _taskTrackerContext.Projects
             .FindAsync(projectId);
 
-        if (result != null)
-            return result;
-        else
-            throw new Exception($"Project with Id: {projectId} not found!");
+#pragma warning disable CS8603 // Possible null reference return.
+        return result;
+#pragma warning restore CS8603 // Possible null reference return.
+
     }
 
     public async Task<IEnumerable<ProjectDto>> GetProjectsAsync()
@@ -37,27 +37,16 @@ public class ProjectRepository : IProjectRepository
 
     public async Task<ProjectDto> UpdateProjectAsync(ProjectDto project)
     {
-        if (project != null)
-        {
             _taskTrackerContext.Attach(project);
             await _taskTrackerContext.SaveChangesAsync();
 
             return project;
-        }
-        else
-            throw new Exception("Project is not updated because it is not found.");
     }
 
-    public async Task DeleteProjectAsync(int projectId)
+    public async Task DeleteProjectAsync(ProjectDto project)
     {
-        var result = await _taskTrackerContext.Projects
-            .FindAsync(projectId);
-
-        if (result != null)
-        {
-            _taskTrackerContext.Projects.Remove(result);
+            _taskTrackerContext.Projects.Remove(project);
             await _taskTrackerContext.SaveChangesAsync();
-        }
     }
 
     public async Task<bool> ProjectExistsAsync(int projectId)

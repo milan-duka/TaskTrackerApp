@@ -5,9 +5,9 @@ public interface IProjectRepository
 {
     Task<ProjectDto> AddProjectAsync(ProjectDto project);
     Task<IEnumerable<ProjectDto>> GetProjectsAsync();
-    Task<ProjectDto> GetProjectAsync(int projectId);
+    Task<ProjectDto> GetProjectByIdAsync(int projectId);
     Task<ProjectDto> UpdateProjectAsync(ProjectDto project);
-    Task DeleteProjectAsync(int projectId);
+    Task DeleteProjectAsync(ProjectDto project);
     Task<bool> ProjectExistsAsync(int projectId);
 }
 

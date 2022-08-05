@@ -19,51 +19,78 @@ namespace Web_API.Controllers
         [HttpGet]
         public async Task<ActionResult<List<ProjectModel>>> GetProjectsAsync()
         {
-            var projects = await _projectService.GetProjectsAsync();
+            try
+            {
+                var projects = await _projectService.GetAllProjectsAsync();
 
-            if (!projects.Any())
-                return Ok();
+                if (!projects.Any())
+                    return Ok();
 
-            return Ok(projects);
-            
+                return Ok(projects);
+            }
+            catch (Exception e) 
+            {
+                return StatusCode(500, e.Message);
+            }
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<ProjectModel>> GetProjectAsync(int id)
         {
-            var project = await _projectService.GetProjectAsync(id);
+            try
+            {
+                var project = await _projectService.GetProjectByIdAsync(id);
 
-            if (project == null)
-                return BadRequest("Project not found.");
-            
-            return Ok(project);
+                return Ok(project);
+            }catch(Exception e)
+            {
+                return BadRequest(e.Message);
+            }
         }
 
         [HttpPost]
         public async Task<ActionResult<List<ProjectModel>>> AddProject(ProjectModel project)
         {
-            var addedProject = await _projectService.AddProjectAsync(project);
+            try
+            {
+                var addedProject = await _projectService.AddProjectAsync(project);
 
-            return Ok(addedProject);
+                return Ok(addedProject);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
         }
 
         [HttpPut("{id}")]
         public async Task<ActionResult<List<ProjectModel>>> UpdateProject(int id, ProjectModel projectForUpdate)
         {
-            var updatedProject = await _projectService.UpdateProjectAsync(id, projectForUpdate);
-            
-            if (updatedProject == null)
-                return BadRequest("Project not found.");
+            try
+            {
+                var updatedProject = await _projectService.UpdateProjectAsync(id, projectForUpdate);
 
-            return Ok(await _projectService.GetProjectsAsync());
+                return Ok(await _projectService.GetAllProjectsAsync());
+
+            }catch(Exception e)
+            {
+                return NotFound(e.Message);
+            }
         }
 
         [HttpDelete("{id}")]
         public async Task<ActionResult<List<ProjectModel>>> DeleteProject(int id)
         {
-            await _projectService.DeleteProjectAsync(id);
+            try
+            {
+                await _projectService.DeleteProjectAsync(id);
 
-            return Ok(await _projectService.GetProjectsAsync());
+                return Ok(await _projectService.GetAllProjectsAsync());
+            }
+            catch (Exception e)
+            {
+                return NotFound(e.Message);
+            }
         }
 
     }

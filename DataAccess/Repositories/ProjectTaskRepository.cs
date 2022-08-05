@@ -26,8 +26,10 @@ public class ProjectTaskRepository : IProjectTaskRepository
 
     public async Task<ProjectTaskDto> GetProjectTaskAsync(int projectTaskId)
     {
+#pragma warning disable CS8603 // Possible null reference return.
         return await _taskTrackerContext.ProjectTasks
             .FindAsync(projectTaskId);
+#pragma warning restore CS8603 // Possible null reference return.
     }
 
     public async Task<IEnumerable<ProjectTaskDto>> GetProjectTasksAsync()

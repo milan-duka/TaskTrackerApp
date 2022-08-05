@@ -32,16 +32,16 @@ public class ProjectService : IProjectService
 
     public async Task DeleteProjectAsync(int projectId)
     {
-        var project = await GetProjectAsync(projectId);
+        var project = await _projectRepository.GetProjectByIdAsync(projectId);
         if (project == null)
             throw new Exception($"Project with id {projectId} can't be deleted because it is not found.");
 
-        await _projectRepository.DeleteProjectAsync(projectId);
+        await _projectRepository.DeleteProjectAsync(project);
     }
 
-    public async Task<ProjectModel> GetProjectAsync(int projectId)
+    public async Task<ProjectModel> GetProjectByIdAsync(int projectId)
     {
-        var projectDto = await _projectRepository.GetProjectAsync(projectId);
+        var projectDto = await _projectRepository.GetProjectByIdAsync(projectId);
 
         if (projectDto != null)
             return _mapper.Map<ProjectModel>(projectDto);
@@ -49,18 +49,15 @@ public class ProjectService : IProjectService
             throw new Exception($"Project with Id: {projectId} not found!");
     }
 
-    public async Task<IEnumerable<ProjectModel>> GetProjectsAsync()
+    public async Task<IEnumerable<ProjectModel>> GetAllProjectsAsync()
     {
         var projectDtos = await _projectRepository.GetProjectsAsync();
 
         var projects = new List<ProjectModel>();
 
-        if (projectDtos.Any())
+        foreach (var projectDto in projectDtos)
         {
-            foreach (var projectDto in projectDtos)
-            {
-                projects.Add(_mapper.Map<ProjectModel>(projectDto));
-            }
+            projects.Add(_mapper.Map<ProjectModel>(projectDto));
         }
 
         return projects;
@@ -80,9 +77,6 @@ public class ProjectService : IProjectService
 
         var result = await _projectRepository.UpdateProjectAsync(projectDto);
 
-        if (result != null)
-            return _mapper.Map<ProjectModel>(result);
-        else
-            throw new Exception("Project is not updated because it is not found.");
+        return _mapper.Map<ProjectModel>(result);
     }
 }
