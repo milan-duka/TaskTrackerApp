@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using BusinessLogic.Interfaces;
+﻿using BusinessLogic.Interfaces;
 using BusinessLogic.Models;
 using DataAccess.Interfaces;
 using DataAccess.Models;
@@ -8,26 +7,27 @@ namespace BusinessLogic.Services;
 public class ProjectService : IProjectService
 {
     private readonly IProjectRepository _projectRepository;
-    private readonly IMapper _mapper;
+    private readonly IProjectMappings _projectMappings;
+    private readonly IProjectTaskMappings _projectTaskMappings;
 
     public ProjectService(
-        IProjectRepository projectRepository, 
-        IMapper mapper)
+        IProjectRepository projectRepository,
+        IProjectMappings businessLogicHelpers,
+        IProjectTaskMappings projectTaskMappings)
     {
         _projectRepository = projectRepository;
-        _mapper = mapper;
+        _projectMappings = businessLogicHelpers;
+        _projectTaskMappings = projectTaskMappings;
     }
 
     public async Task<ProjectModel> AddProjectAsync(ProjectModel project)
     {
         if (project == null)
             throw new Exception("There is no any project to add.");
-
-        var newProjectDto = _mapper.Map<ProjectDto>(project);
+        ProjectDto newProjectDto = _projectMappings.MapProjectBlModelToProjectDto(project);
 
         await _projectRepository.AddProjectAsync(newProjectDto);
-
-        return _mapper.Map<ProjectModel>(newProjectDto);
+        return _projectMappings.MapProjectDtoToProjectBlModel(newProjectDto);
     }
 
     public async Task DeleteProjectAsync(int projectId)
@@ -44,7 +44,7 @@ public class ProjectService : IProjectService
         var projectDto = await _projectRepository.GetProjectByIdAsync(projectId);
 
         if (projectDto != null)
-            return _mapper.Map<ProjectModel>(projectDto);
+            return _projectMappings.MapProjectDtoToProjectBlModel(projectDto);
         else
             throw new Exception($"Project with Id: {projectId} not found!");
     }
@@ -57,7 +57,7 @@ public class ProjectService : IProjectService
 
         foreach (var projectDto in projectDtos)
         {
-            projects.Add(_mapper.Map<ProjectModel>(projectDto));
+            projects.Add(_projectMappings.MapProjectDtoToProjectBlModel(projectDto));
         }
 
         return projects;
@@ -72,11 +72,11 @@ public class ProjectService : IProjectService
         if (project == null)
             throw new Exception("There are missing data for project update.");
 
-        var projectDto = _mapper.Map<ProjectDto>(project);
+        var projectDto = _projectMappings.MapProjectBlModelToProjectDto(project);
         projectDto.Id = projectId;
 
-        var result = await _projectRepository.UpdateProjectAsync(projectDto);
+        await _projectRepository.UpdateProjectAsync(projectDto);
 
-        return _mapper.Map<ProjectModel>(result);
+        return _projectMappings.MapProjectDtoToProjectBlModel(projectDto);
     }
 }

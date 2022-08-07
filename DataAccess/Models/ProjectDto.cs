@@ -11,5 +11,7 @@ public class ProjectDto
     public DateTime? CompletionDate { get; set; }
     public ProjectStatus Status { get; set; }
     public int Priority { get; set; }
+
+    public virtual ICollection<ProjectTaskDto> ProjectTasks { get; set; }
 }
 

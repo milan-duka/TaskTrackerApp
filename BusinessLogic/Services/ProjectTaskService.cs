@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using BusinessLogic.Interfaces;
+﻿using BusinessLogic.Interfaces;
 using BusinessLogic.Models;
 using DataAccess.Interfaces;
 using DataAccess.Models;
@@ -8,14 +7,14 @@ namespace BusinessLogic.Services;
 public class ProjectTaskService : IProjectTaskService
 {
     private readonly IProjectTaskRepository _projectTaskRepository;
-    private readonly IMapper _mapper;
+    private readonly IProjectTaskMappings _projectTaskMappings;
 
     public ProjectTaskService(
-        IProjectTaskRepository projectTaskRepository, 
-        IMapper mapper)
+        IProjectTaskRepository projectTaskRepository,
+        IProjectTaskMappings projectTaskMappings)
     {
         _projectTaskRepository = projectTaskRepository;
-        _mapper = mapper;
+        _projectTaskMappings = projectTaskMappings;
     }
 
     public async Task<ProjectTaskModel> AddProjectTaskAsync(ProjectTaskModel projectTask)
@@ -23,11 +22,11 @@ public class ProjectTaskService : IProjectTaskService
         if (projectTask == null)
             throw new Exception("There is no any project to add.");
 
-        var newProjectTaskDto = _mapper.Map<ProjectTaskDto>(projectTask);
+        var newProjectTaskDto = _projectTaskMappings.MapProjectTaskBlModelToProjectTaskDto(projectTask);
 
         await _projectTaskRepository.AddProjectTaskAsync(newProjectTaskDto);
 
-        return _mapper.Map<ProjectTaskModel>(newProjectTaskDto);
+        return _projectTaskMappings.MapProjectTaskDtoToProjectTaskBlModel(newProjectTaskDto);
     }
 
     public async Task DeleteProjectTaskAsync(int projectTaskId)
@@ -44,7 +43,7 @@ public class ProjectTaskService : IProjectTaskService
         var projectTaskDto = await _projectTaskRepository.GetProjectTaskAsync(projectTaskId);
 
         if (projectTaskDto != null)
-            return _mapper.Map<ProjectTaskModel>(projectTaskDto);
+            return _projectTaskMappings.MapProjectTaskDtoToProjectTaskBlModel(projectTaskDto);
         else
             throw new Exception($"Task with Id: {projectTaskId} not found!");
     }
@@ -52,17 +51,17 @@ public class ProjectTaskService : IProjectTaskService
     public async Task<IEnumerable<ProjectTaskModel>> GetProjectTasksAsync()
     {
         var projectTaskDtos = await _projectTaskRepository.GetProjectTasksAsync();
-        
-        if(!projectTaskDtos.Any())
+
+        if (!projectTaskDtos.Any())
             throw new Exception("There doesn't exist any task.");
 
         var projectTasks = new List<ProjectTaskModel>();
 
-        foreach (var projectTask in projectTaskDtos)
+        foreach (var projectTaskDto in projectTaskDtos)
         {
-            projectTasks.Add(_mapper.Map<ProjectTaskModel>(projectTask));
+            projectTasks.Add(_projectTaskMappings.MapProjectTaskDtoToProjectTaskBlModel(projectTaskDto));
         }
-        
+
         return projectTasks;
     }
 
@@ -75,13 +74,13 @@ public class ProjectTaskService : IProjectTaskService
         if (projectTask == null)
             throw new Exception("There are missing data for project update.");
 
-        var projectTaskDto = _mapper.Map<ProjectTaskDto>(projectTask);
+        var projectTaskDto = _projectTaskMappings.MapProjectTaskBlModelToProjectTaskDto(projectTask);
         projectTaskDto.Id = projectTaskId;
 
         var result = await _projectTaskRepository.UpdateProjectTaskAsync(projectTaskDto);
 
         if (result != null)
-            return _mapper.Map<ProjectTaskModel>(result);
+            return _projectTaskMappings.MapProjectTaskDtoToProjectTaskBlModel(projectTaskDto);
         else
             throw new Exception("Task is not updated because it is not found.");
     }

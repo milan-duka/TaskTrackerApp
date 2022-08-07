@@ -20,9 +20,10 @@ builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
 builder.Services.AddScoped<IProjectTaskRepository, ProjectTaskRepository>();
 builder.Services.AddScoped<IProjectService, ProjectService>();
 builder.Services.AddScoped<IProjectTaskService, ProjectTaskService>();
+builder.Services.AddScoped<IProjectMappings, ProjectMappings>();
+builder.Services.AddScoped<IProjectTaskMappings, ProjectTaskMappings>();
 
 builder.Services.AddSwaggerGen();
-builder.Services.AddAutoMapper(typeof(TaskTrackerProfile));
 
 var app = builder.Build();
 

@@ -11,12 +11,11 @@ public class ProjectRepository : IProjectRepository
     {
         _taskTrackerContext = taskTrackerContext;
     }
-    public async Task<ProjectDto> AddProjectAsync(ProjectDto project)
+    public async Task AddProjectAsync(ProjectDto project)
     {
         var result = await _taskTrackerContext.AddAsync(project);
 
         await _taskTrackerContext.SaveChangesAsync();
-        return result.Entity;
     }
 
     public async Task<ProjectDto> GetProjectByIdAsync(int projectId)
@@ -35,12 +34,11 @@ public class ProjectRepository : IProjectRepository
         return await _taskTrackerContext.Projects.ToListAsync();
     }
 
-    public async Task<ProjectDto> UpdateProjectAsync(ProjectDto project)
+    public async Task UpdateProjectAsync(ProjectDto project)
     {
-            _taskTrackerContext.Attach(project);
-            await _taskTrackerContext.SaveChangesAsync();
-
-            return project;
+        _taskTrackerContext.Attach(project);
+        _taskTrackerContext.Entry(project).State = EntityState.Modified;
+        await _taskTrackerContext.SaveChangesAsync();
     }
 
     public async Task DeleteProjectAsync(ProjectDto project)
