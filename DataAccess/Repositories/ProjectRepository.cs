@@ -13,25 +13,30 @@ public class ProjectRepository : IProjectRepository
     }
     public async Task AddProjectAsync(ProjectDto project)
     {
-        var result = await _taskTrackerContext.AddAsync(project);
+        await _taskTrackerContext.AddAsync(project);
 
         await _taskTrackerContext.SaveChangesAsync();
     }
 
-    public async Task<ProjectDto> GetProjectByIdAsync(int projectId)
-    {
-        var result = await _taskTrackerContext.Projects
-            .FindAsync(projectId);
-
-#pragma warning disable CS8603 // Possible null reference return.
-        return result;
-#pragma warning restore CS8603 // Possible null reference return.
-
-    }
-
-    public async Task<IEnumerable<ProjectDto>> GetProjectsAsync()
+    public async Task<IEnumerable<ProjectDto>> GetAllProjectsAsync()
     {
         return await _taskTrackerContext.Projects.ToListAsync();
+    }
+
+    public async Task<IEnumerable<ProjectDto>> GetAllProjectsWithTasksAsync()
+    {
+        return await _taskTrackerContext.Projects
+            .Include(p => p.ProjectTasks)
+            .ToListAsync();
+    }
+
+    public async Task<ProjectDto> GetProjectByIdAsync(int projectId)
+    {
+#pragma warning disable CS8603 // Possible null reference return.
+        return await _taskTrackerContext.Projects
+            .FindAsync(projectId);
+#pragma warning restore CS8603 // Possible null reference return.
+
     }
 
     public async Task UpdateProjectAsync(ProjectDto project)
@@ -43,8 +48,8 @@ public class ProjectRepository : IProjectRepository
 
     public async Task DeleteProjectAsync(ProjectDto project)
     {
-            _taskTrackerContext.Projects.Remove(project);
-            await _taskTrackerContext.SaveChangesAsync();
+        _taskTrackerContext.Projects.Remove(project);
+        await _taskTrackerContext.SaveChangesAsync();
     }
 
     public async Task<bool> ProjectExistsAsync(int projectId)

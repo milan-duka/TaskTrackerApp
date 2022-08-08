@@ -7,6 +7,6 @@ namespace BusinessLogic.Interfaces
     {
         ProjectDto MapProjectBlModelToProjectDto(ProjectModel project);
         ProjectModel MapProjectDtoToProjectBlModel(ProjectDto projectDto);
-        //ProjectModel MapProjectDtoWithTasksToProjectBlModelWithTasks(ProjectDto projectDto);
+        ProjectWithTasksModel MapProjectDtoWithTasksToProjectBlModelWithTasks(ProjectDto projectDto);
     }
 }

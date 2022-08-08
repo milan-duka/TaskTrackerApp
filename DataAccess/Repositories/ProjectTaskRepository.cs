@@ -16,15 +16,24 @@ public class ProjectTaskRepository : IProjectTaskRepository
     {
         _taskTrackerContext = taskTrackerContext;
     }
-    public async Task<ProjectTaskDto> AddProjectTaskAsync(ProjectTaskDto projectTask)
+    public async Task AddProjectTaskAsync(ProjectTaskDto projectTask)
     {
-        var result = await _taskTrackerContext.ProjectTasks.AddAsync(projectTask);
+        await _taskTrackerContext.ProjectTasks.AddAsync(projectTask);
 
         await _taskTrackerContext.SaveChangesAsync();
-        return result.Entity;
     }
 
-    public async Task<ProjectTaskDto> GetProjectTaskAsync(int projectTaskId)
+    public async Task<IEnumerable<ProjectTaskDto>> GetAllProjectTasksAsync()
+    {
+        return await _taskTrackerContext.ProjectTasks.ToListAsync();
+    }
+
+    public async Task<IEnumerable<ProjectTaskDto>> GetAllProjectTasksByProjectIdAsync(int projectId)
+    {
+        return await _taskTrackerContext.ProjectTasks.Where(pt => pt.ProjectId == projectId).ToListAsync();
+    }
+
+    public async Task<ProjectTaskDto> GetProjectTaskByIdAsync(int projectTaskId)
     {
 #pragma warning disable CS8603 // Possible null reference return.
         return await _taskTrackerContext.ProjectTasks
@@ -32,41 +41,29 @@ public class ProjectTaskRepository : IProjectTaskRepository
 #pragma warning restore CS8603 // Possible null reference return.
     }
 
-    public async Task<IEnumerable<ProjectTaskDto>> GetProjectTasksAsync()
+    public async Task UpdateProjectTaskAsync(ProjectTaskDto projectTask)
     {
-        return await _taskTrackerContext.ProjectTasks.ToListAsync();
+        _taskTrackerContext.Attach(projectTask);
+        _taskTrackerContext.Entry(projectTask).State = EntityState.Modified;
+        await _taskTrackerContext.SaveChangesAsync();
     }
 
-    public async Task<ProjectTaskDto> UpdateProjectTaskAsync(ProjectTaskDto projectTask)
+    public async Task DeleteProjectTaskAsync(ProjectTaskDto projectTask)
     {
-        var result = await _taskTrackerContext.ProjectTasks
-            .FindAsync(projectTask.Id);
-
-        if (result != null)
-        {
-            result.Name = projectTask.Name;
-            result.Status = projectTask.Status;
-            result.Description = projectTask.Description;
-            result.Priority = projectTask.Priority;
-            result.ProjectId = projectTask.ProjectId;
-
-            await _taskTrackerContext.SaveChangesAsync();
-
-            return result;
-        }
-
-        return null;
+        _taskTrackerContext.ProjectTasks.Remove(projectTask);
+        await _taskTrackerContext.SaveChangesAsync();
     }
 
-    public async Task DeleteProjectTaskAsync(int projectTaskId)
+    public async Task<bool> ProjectTaskExistsAsync(int projectTaskId)
     {
         var result = await _taskTrackerContext.ProjectTasks
             .FindAsync(projectTaskId);
-        if (result != null)
-        {
-            _taskTrackerContext.ProjectTasks.Remove(result);
-            await _taskTrackerContext.SaveChangesAsync();
-        }
+
+        if (result == null)
+            return false;
+
+        _taskTrackerContext.Entry(result).State = EntityState.Detached;
+        return true;
     }
 }
 

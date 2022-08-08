@@ -31,7 +31,7 @@ namespace BusinessLogic.Mappings
             };
         }
 
-        public ProjectModel MapProjectDtoWithTasksToProjectBlModelWithTasks(ProjectDto projectDto)
+        public ProjectWithTasksModel MapProjectDtoWithTasksToProjectBlModelWithTasks(ProjectDto projectDto)
         {
             return new ProjectWithTasksModel
             {
@@ -40,7 +40,7 @@ namespace BusinessLogic.Mappings
                 CompletionDate = projectDto.CompletionDate.HasValue ? projectDto.CompletionDate.Value : null,
                 Status = projectDto.Status,
                 Priority = projectDto.Priority,
-                ProjectTasks = MapProjectTaskDtoCollectionToProjectTaskModelCollection(projectDto.ProjectTasks)
+                ProjectTasks = projectDto.ProjectTasks != null ? MapProjectTaskDtoCollectionToProjectTaskModelCollection(projectDto.ProjectTasks) : new List<ProjectTaskModel>()
             };
         }
 
@@ -65,7 +65,7 @@ namespace BusinessLogic.Mappings
                 Status = projectTaskDto.Status,
                 Description = projectTaskDto.Description,
                 Priority = projectTaskDto.Priority,
-                ProjectId = projectTaskDto.ProjectId
+                ProjectId = projectTaskDto.ProjectId.HasValue ? projectTaskDto.ProjectId.Value : null
             };
         }
 

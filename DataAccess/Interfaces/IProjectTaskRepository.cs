@@ -3,10 +3,12 @@
 namespace DataAccess.Interfaces;
 public interface IProjectTaskRepository
 {
-    Task<ProjectTaskDto> AddProjectTaskAsync(ProjectTaskDto projectTask);
-    Task<IEnumerable<ProjectTaskDto>> GetProjectTasksAsync();
-    Task<ProjectTaskDto> GetProjectTaskAsync(int projectTaskId);
-    Task<ProjectTaskDto> UpdateProjectTaskAsync(ProjectTaskDto projectTask);
-    Task DeleteProjectTaskAsync(int projectTaskId);
+    Task AddProjectTaskAsync(ProjectTaskDto projectTask);
+    Task<IEnumerable<ProjectTaskDto>> GetAllProjectTasksAsync();
+    Task<IEnumerable<ProjectTaskDto>> GetAllProjectTasksByProjectIdAsync(int projectId);
+    Task<ProjectTaskDto> GetProjectTaskByIdAsync(int projectTaskId);
+    Task UpdateProjectTaskAsync(ProjectTaskDto projectTask);
+    Task DeleteProjectTaskAsync(ProjectTaskDto projectTask);
+    Task<bool> ProjectTaskExistsAsync(int projectTaskId);
 }
 

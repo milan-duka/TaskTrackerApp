@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace BusinessLogic.Models
 {
-    internal class ProjectWithTasksModel : ProjectModel
+    public class ProjectWithTasksModel : ProjectModel
     {
         public ICollection<ProjectTaskModel> ProjectTasks { get; set; }
 

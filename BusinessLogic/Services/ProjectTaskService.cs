@@ -29,31 +29,9 @@ public class ProjectTaskService : IProjectTaskService
         return _projectTaskMappings.MapProjectTaskDtoToProjectTaskBlModel(newProjectTaskDto);
     }
 
-    public async Task DeleteProjectTaskAsync(int projectTaskId)
+    public async Task<IEnumerable<ProjectTaskModel>> GetAllProjectTasksAsync()
     {
-        var projectTask = await GetProjectTaskAsync(projectTaskId);
-        if (projectTask == null)
-            throw new Exception($"Task with id {projectTaskId} can't be deleted because it is not found.");
-
-        await _projectTaskRepository.DeleteProjectTaskAsync(projectTaskId);
-    }
-
-    public async Task<ProjectTaskModel> GetProjectTaskAsync(int projectTaskId)
-    {
-        var projectTaskDto = await _projectTaskRepository.GetProjectTaskAsync(projectTaskId);
-
-        if (projectTaskDto != null)
-            return _projectTaskMappings.MapProjectTaskDtoToProjectTaskBlModel(projectTaskDto);
-        else
-            throw new Exception($"Task with Id: {projectTaskId} not found!");
-    }
-
-    public async Task<IEnumerable<ProjectTaskModel>> GetProjectTasksAsync()
-    {
-        var projectTaskDtos = await _projectTaskRepository.GetProjectTasksAsync();
-
-        if (!projectTaskDtos.Any())
-            throw new Exception("There doesn't exist any task.");
+        var projectTaskDtos = await _projectTaskRepository.GetAllProjectTasksAsync();
 
         var projectTasks = new List<ProjectTaskModel>();
 
@@ -65,10 +43,34 @@ public class ProjectTaskService : IProjectTaskService
         return projectTasks;
     }
 
+    public async Task<IEnumerable<ProjectTaskModel>> GetAllProjectTasksByProjectIdAsync(int projectId)
+    {
+        var projectTaskDtos = await _projectTaskRepository.GetAllProjectTasksByProjectIdAsync(projectId);
+
+        var projectTasks = new List<ProjectTaskModel>();
+
+        foreach (var projectTaskDto in projectTaskDtos)
+        {
+            projectTasks.Add(_projectTaskMappings.MapProjectTaskDtoToProjectTaskBlModel(projectTaskDto));
+        }
+
+        return projectTasks;
+    }
+
+    public async Task<ProjectTaskModel> GetProjectTaskByIdAsync(int projectTaskId)
+    {
+        var projectTaskDto = await _projectTaskRepository.GetProjectTaskByIdAsync(projectTaskId);
+
+        if (projectTaskDto != null)
+            return _projectTaskMappings.MapProjectTaskDtoToProjectTaskBlModel(projectTaskDto);
+        else
+            throw new Exception($"Task with Id: {projectTaskId} not found!");
+    }
+
     public async Task<ProjectTaskModel> UpdateProjectTaskAsync(int projectTaskId, ProjectTaskModel projectTask)
     {
-        var existingTask = await GetProjectTaskAsync(projectTaskId);
-        if (existingTask == null)
+        var projectTaskExists = await _projectTaskRepository.ProjectTaskExistsAsync(projectTaskId);
+        if (!projectTaskExists)
             throw new Exception($"Task with id {projectTaskId} can't be updated because it is not found.");
 
         if (projectTask == null)
@@ -77,11 +79,18 @@ public class ProjectTaskService : IProjectTaskService
         var projectTaskDto = _projectTaskMappings.MapProjectTaskBlModelToProjectTaskDto(projectTask);
         projectTaskDto.Id = projectTaskId;
 
-        var result = await _projectTaskRepository.UpdateProjectTaskAsync(projectTaskDto);
+        await _projectTaskRepository.UpdateProjectTaskAsync(projectTaskDto);
 
-        if (result != null)
-            return _projectTaskMappings.MapProjectTaskDtoToProjectTaskBlModel(projectTaskDto);
-        else
-            throw new Exception("Task is not updated because it is not found.");
+        return _projectTaskMappings.MapProjectTaskDtoToProjectTaskBlModel(projectTaskDto);
+    }
+
+    public async Task DeleteProjectTaskAsync(int projectTaskId)
+    {
+        var projectTaskDto = await _projectTaskRepository.GetProjectTaskByIdAsync(projectTaskId);
+
+        if (projectTaskDto == null)
+            throw new Exception($"Task with id {projectTaskId} can't be deleted because it is not found.");
+
+        await _projectTaskRepository.DeleteProjectTaskAsync(projectTaskDto);
     }
 }
