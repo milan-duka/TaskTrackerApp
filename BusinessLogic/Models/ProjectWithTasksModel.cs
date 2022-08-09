@@ -8,7 +8,7 @@ namespace BusinessLogic.Models
 {
     public class ProjectWithTasksModel : ProjectModel
     {
-        public ICollection<ProjectTaskModel> ProjectTasks { get; set; }
+        public IEnumerable<ProjectTaskModel> ProjectTasks { get; set; }
 
         public ProjectWithTasksModel()
         {

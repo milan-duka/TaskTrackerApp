@@ -4,9 +4,9 @@ using DataAccess.Models;
 
 namespace BusinessLogic.Mappings
 {
-    public class ProjectTaskMappings : IProjectTaskMappings
+    public class ProjectTaskMappings
     {
-        public ProjectTaskDto MapProjectTaskBlModelToProjectTaskDto(ProjectTaskModel projectTask)
+        public static ProjectTaskDto MapProjectTaskBlModelToProjectTaskDto(ProjectTaskModel projectTask)
         {
             return new ProjectTaskDto
             {
@@ -18,7 +18,7 @@ namespace BusinessLogic.Mappings
             };
         }
 
-        public ProjectTaskModel MapProjectTaskDtoToProjectTaskBlModel(ProjectTaskDto projectTaskDto)
+        public static ProjectTaskModel MapProjectTaskDtoToProjectTaskBlModel(ProjectTaskDto projectTaskDto)
         {
             return new ProjectTaskModel
             {
@@ -30,7 +30,7 @@ namespace BusinessLogic.Mappings
             };
         }
 
-        public ICollection<ProjectTaskModel> MapProjectTaskDtoCollectionToProjectTaskModelCollection(ICollection<ProjectTaskDto> projectDtoCollection)
+        public static IEnumerable<ProjectTaskModel> MapProjectTaskDtoCollectionToProjectTaskModelCollection(IEnumerable<ProjectTaskDto> projectDtoCollection)
         {
             var projectTaskModels = new List<ProjectTaskModel>();
             foreach (var projectTaskDto in projectDtoCollection)

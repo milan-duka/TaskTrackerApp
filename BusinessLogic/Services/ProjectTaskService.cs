@@ -1,32 +1,39 @@
-﻿using BusinessLogic.Interfaces;
+﻿using BusinessLogic.Helpers;
+using BusinessLogic.Interfaces;
+using BusinessLogic.Mappings;
 using BusinessLogic.Models;
 using DataAccess.Interfaces;
-using DataAccess.Models;
 
 namespace BusinessLogic.Services;
 public class ProjectTaskService : IProjectTaskService
 {
     private readonly IProjectTaskRepository _projectTaskRepository;
-    private readonly IProjectTaskMappings _projectTaskMappings;
+    private readonly IProjectRepository _projectRepository;
 
     public ProjectTaskService(
         IProjectTaskRepository projectTaskRepository,
-        IProjectTaskMappings projectTaskMappings)
+        IProjectRepository projectRepository)
     {
         _projectTaskRepository = projectTaskRepository;
-        _projectTaskMappings = projectTaskMappings;
+        _projectRepository = projectRepository;
     }
 
-    public async Task<ProjectTaskModel> AddProjectTaskAsync(ProjectTaskModel projectTask)
+    public async Task<int?> AddProjectTaskAsync(ProjectTaskModel projectTask)
     {
-        if (projectTask == null)
-            throw new Exception("There is no any project to add.");
+        if (projectTask == null || !projectTask.ProjectId.HasValue)
+            return null;
 
-        var newProjectTaskDto = _projectTaskMappings.MapProjectTaskBlModelToProjectTaskDto(projectTask);
+        var projectDto = _projectRepository.GetProjectByIdAsync(projectTask.ProjectId.Value);
+
+        if (projectDto.Result == null)
+            throw ExceptionHandlingHelper.ExceptionWithCustomCodeAndMessage(404,
+                $"Project task can't be added because related project with id {projectTask.ProjectId.Value} doesn't exist.");
+
+        var newProjectTaskDto = ProjectTaskMappings.MapProjectTaskBlModelToProjectTaskDto(projectTask);
 
         await _projectTaskRepository.AddProjectTaskAsync(newProjectTaskDto);
 
-        return _projectTaskMappings.MapProjectTaskDtoToProjectTaskBlModel(newProjectTaskDto);
+        return newProjectTaskDto.Id;
     }
 
     public async Task<IEnumerable<ProjectTaskModel>> GetAllProjectTasksAsync()
@@ -37,7 +44,7 @@ public class ProjectTaskService : IProjectTaskService
 
         foreach (var projectTaskDto in projectTaskDtos)
         {
-            projectTasks.Add(_projectTaskMappings.MapProjectTaskDtoToProjectTaskBlModel(projectTaskDto));
+            projectTasks.Add(ProjectTaskMappings.MapProjectTaskDtoToProjectTaskBlModel(projectTaskDto));
         }
 
         return projectTasks;
@@ -45,13 +52,19 @@ public class ProjectTaskService : IProjectTaskService
 
     public async Task<IEnumerable<ProjectTaskModel>> GetAllProjectTasksByProjectIdAsync(int projectId)
     {
-        var projectTaskDtos = await _projectTaskRepository.GetAllProjectTasksByProjectIdAsync(projectId);
-
         var projectTasks = new List<ProjectTaskModel>();
+
+        var projectDto = _projectRepository.GetProjectByIdAsync(projectId);
+
+        if (projectDto.Result == null)
+            throw ExceptionHandlingHelper.ExceptionWithCustomCodeAndMessage(404,
+            $"Project with id {projectId} doesn't exist.");
+
+        var projectTaskDtos = await _projectTaskRepository.GetAllProjectTasksByProjectIdAsync(projectId);
 
         foreach (var projectTaskDto in projectTaskDtos)
         {
-            projectTasks.Add(_projectTaskMappings.MapProjectTaskDtoToProjectTaskBlModel(projectTaskDto));
+            projectTasks.Add(ProjectTaskMappings.MapProjectTaskDtoToProjectTaskBlModel(projectTaskDto));
         }
 
         return projectTasks;
@@ -61,27 +74,35 @@ public class ProjectTaskService : IProjectTaskService
     {
         var projectTaskDto = await _projectTaskRepository.GetProjectTaskByIdAsync(projectTaskId);
 
-        if (projectTaskDto != null)
-            return _projectTaskMappings.MapProjectTaskDtoToProjectTaskBlModel(projectTaskDto);
-        else
-            throw new Exception($"Task with Id: {projectTaskId} not found!");
+        if (projectTaskDto == null)
+            throw ExceptionHandlingHelper.ExceptionWithCustomCodeAndMessage(404,
+            $"Task with Id: {projectTaskId} not found!");
+
+        return ProjectTaskMappings.MapProjectTaskDtoToProjectTaskBlModel(projectTaskDto);
     }
 
-    public async Task<ProjectTaskModel> UpdateProjectTaskAsync(int projectTaskId, ProjectTaskModel projectTask)
+    public async Task UpdateProjectTaskAsync(int projectTaskId, ProjectTaskModel projectTask)
     {
         var projectTaskExists = await _projectTaskRepository.ProjectTaskExistsAsync(projectTaskId);
+
         if (!projectTaskExists)
-            throw new Exception($"Task with id {projectTaskId} can't be updated because it is not found.");
+            throw ExceptionHandlingHelper.ExceptionWithCustomCodeAndMessage(404,
+                    $"Task with id {projectTaskId} can't be updated because it is not found.");
 
-        if (projectTask == null)
-            throw new Exception("There are missing data for project update.");
+        if (projectTask.ProjectId.HasValue)
+        {
+            var projectDto = _projectRepository.GetProjectByIdAsync(projectTask.ProjectId.Value);
 
-        var projectTaskDto = _projectTaskMappings.MapProjectTaskBlModelToProjectTaskDto(projectTask);
+            if (projectDto.Result == null)
+                throw ExceptionHandlingHelper.ExceptionWithCustomCodeAndMessage(404,
+                $"Related project with id {projectTask.ProjectId.Value} doesn't exist so this project task can't be updated.");
+
+        }
+
+        var projectTaskDto = ProjectTaskMappings.MapProjectTaskBlModelToProjectTaskDto(projectTask);
         projectTaskDto.Id = projectTaskId;
 
         await _projectTaskRepository.UpdateProjectTaskAsync(projectTaskDto);
-
-        return _projectTaskMappings.MapProjectTaskDtoToProjectTaskBlModel(projectTaskDto);
     }
 
     public async Task DeleteProjectTaskAsync(int projectTaskId)
@@ -89,7 +110,8 @@ public class ProjectTaskService : IProjectTaskService
         var projectTaskDto = await _projectTaskRepository.GetProjectTaskByIdAsync(projectTaskId);
 
         if (projectTaskDto == null)
-            throw new Exception($"Task with id {projectTaskId} can't be deleted because it is not found.");
+            throw ExceptionHandlingHelper.ExceptionWithCustomCodeAndMessage(404,
+                    $"Task with id {projectTaskId} can't be deleted because it is not found.");
 
         await _projectTaskRepository.DeleteProjectTaskAsync(projectTaskDto);
     }

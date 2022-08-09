@@ -6,7 +6,7 @@ namespace Web_API.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class ProjectTasksController : ControllerBase
+public class ProjectTasksController : TaskTrackerBaseController
 {
     private readonly IProjectTaskService _projectTaskService;
 
@@ -15,39 +15,48 @@ public class ProjectTasksController : ControllerBase
         _projectTaskService = projectTaskService;
     }
 
+    [HttpPost]
+    public async Task<ActionResult> AddProjectTaskAsync(ProjectTaskModel projectTask)
+    {
+        try
+        {
+            var addedProjectTaskId = await _projectTaskService.AddProjectTaskAsync(projectTask);
+
+            return Ok($"Project task is successfully added with id: {addedProjectTaskId}");
+        }
+        catch (Exception e)
+        {
+            return ReturnStatusCodeWithExceptionMessage(e);
+        }
+    }
+
     [HttpGet]
-    public async Task<ActionResult<List<ProjectTaskModel>>> GetAllProjectTasksAsync()
+    public async Task<ActionResult<IEnumerable<ProjectTaskModel>>> GetAllProjectTasksAsync()
     {
         try
         {
             var projectTasks = await _projectTaskService.GetAllProjectTasksAsync();
 
-            if (!projectTasks.Any())
-                return Ok();
-
             return Ok(projectTasks);
         }
         catch (Exception e) 
         {
-            return StatusCode(500, e.Message);
+            return ReturnStatusCodeWithExceptionMessage(e);
         }
     }
 
     [HttpGet("projectTasksByProjectId/{projectId}")]
-    public async Task<ActionResult<List<ProjectTaskModel>>> GetAllProjectTasksByProjectIdAsync(int projectId)
+    public async Task<ActionResult<IEnumerable<ProjectTaskModel>>> GetAllProjectTasksByProjectIdAsync(int projectId)
     {
         try
         {
             var projectTasks = await _projectTaskService.GetAllProjectTasksByProjectIdAsync(projectId);
 
-            if (!projectTasks.Any())
-                return Ok();
-
             return Ok(projectTasks);
         }
         catch (Exception e)
         {
-            return StatusCode(500, e.Message);
+            return ReturnStatusCodeWithExceptionMessage(e);
         }
     }
 
@@ -59,54 +68,40 @@ public class ProjectTasksController : ControllerBase
             var projectTask = await _projectTaskService.GetProjectTaskByIdAsync(id);
 
             return Ok(projectTask);
+
         }catch(Exception e)
         {
-            return BadRequest(e.Message);
-        }
-    }
-
-    [HttpPost]
-    public async Task<ActionResult<List<ProjectTaskModel>>> AddProjectTask(ProjectTaskModel projectTask)
-    {
-        try
-        {
-            var addedProjectTask = await _projectTaskService.AddProjectTaskAsync(projectTask);
-
-            return Ok(addedProjectTask);
-        }
-        catch (Exception e)
-        {
-            return BadRequest(e.Message);
+            return ReturnStatusCodeWithExceptionMessage(e);
         }
     }
 
     [HttpPut("{id}")]
-    public async Task<ActionResult<List<ProjectTaskModel>>> UpdateProjectTask(int id, ProjectTaskModel projectTaskForUpdate)
+    public async Task<ActionResult> UpdateProjectTaskAsync(int id, ProjectTaskModel projectTaskForUpdate)
     {
         try
         {
-            var updatedProjectTask = await _projectTaskService.UpdateProjectTaskAsync(id, projectTaskForUpdate);
+            await _projectTaskService.UpdateProjectTaskAsync(id, projectTaskForUpdate);
 
-            return Ok(await _projectTaskService.GetAllProjectTasksAsync());
+            return Ok("Project task successfully updated.");
 
         }catch(Exception e)
         {
-            return NotFound(e.Message);
+            return ReturnStatusCodeWithExceptionMessage(e);
         }
     }
 
     [HttpDelete("{id}")]
-    public async Task<ActionResult<List<ProjectTaskModel>>> DeleteProjectTask(int id)
+    public async Task<ActionResult> DeleteProjectTaskAsync(int id)
     {
         try
         {
             await _projectTaskService.DeleteProjectTaskAsync(id);
 
-            return Ok(await _projectTaskService.GetAllProjectTasksAsync());
+            return Ok("Project task deleted successfully.");
         }
         catch (Exception e)
         {
-            return NotFound(e.Message);
+            return ReturnStatusCodeWithExceptionMessage(e);
         }
     }
 

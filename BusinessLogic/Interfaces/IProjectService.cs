@@ -3,11 +3,11 @@
 namespace BusinessLogic.Interfaces;
 public interface IProjectService
 {
-    Task<ProjectModel> AddProjectAsync(ProjectModel project);
+    Task<int?> AddProjectAsync(ProjectModel project);
     Task<IEnumerable<ProjectModel>> GetAllProjectsAsync();
     Task<IEnumerable<ProjectModel>> GetAllProjectsWithTasksAsync();
     Task<ProjectModel> GetProjectByIdAsync(int projectId);
-    Task<ProjectModel> UpdateProjectAsync(int projectId, ProjectModel project);
+    Task UpdateProjectAsync(int projectId, ProjectModel project);
     Task DeleteProjectAsync(int projectId);
 }
 
