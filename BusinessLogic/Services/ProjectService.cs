@@ -32,20 +32,6 @@ public class ProjectService : IProjectService
     {
         var projectDtos = await _projectRepository.GetAllProjectsAsync();
 
-        var projects = new List<ProjectModel>();
-
-        foreach (var projectDto in projectDtos)
-        {
-            projects.Add(ProjectMappings.MapProjectDtoToProjectBlModel(projectDto));
-        }
-
-        return projects;
-    }
-
-    public async Task<IEnumerable<ProjectModel>> GetAllProjectsWithTasksAsync()
-    {
-        var projectDtos = await _projectRepository.GetAllProjectsWithTasksAsync();
-
         var projects = new List<ProjectWithTasksModel>();
 
         foreach (var projectDto in projectDtos)

@@ -1,7 +1,6 @@
 ﻿using BusinessLogic.Interfaces;
 using BusinessLogic.Models;
 using Microsoft.AspNetCore.Mvc;
-using System.Globalization;
 
 namespace Web_API.Controllers;
 
@@ -32,27 +31,11 @@ public class ProjectsController : TaskTrackerBaseController
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<ProjectModel>>> GetAllProjectsAsync()
+    public async Task<ActionResult<IEnumerable<ProjectWithTasksModel>>> GetAllProjectsAsync()
     {
         try
         {
             var projects = await _projectService.GetAllProjectsAsync();
-
-            return Ok(projects);
-        }
-        catch (Exception e)
-        {
-            return ReturnStatusCodeWithExceptionMessage(e);
-        }
-    }
-
-    [HttpGet]
-    [Route("allProjectsWithTasks")]
-    public async Task<ActionResult<IEnumerable<ProjectWithTasksModel>>> GetAllProjectsWithTasksAsync()
-    {
-        try
-        {
-            var projects = await _projectService.GetAllProjectsWithTasksAsync();
 
             return Ok(projects);
         }

@@ -21,11 +21,6 @@ public class ProjectRepository : IProjectRepository
 
     public async Task<IEnumerable<ProjectDto>> GetAllProjectsAsync()
     {
-        return await _taskTrackerContext.Projects.ToListAsync();
-    }
-
-    public async Task<IEnumerable<ProjectDto>> GetAllProjectsWithTasksAsync()
-    {
         return await _taskTrackerContext.Projects
             .Include(p => p.ProjectTasks)
             .ToListAsync();
