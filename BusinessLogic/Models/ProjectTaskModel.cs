@@ -12,7 +12,7 @@ public class ProjectTaskModel
     public string? Description { get; set; }
     public int Priority { get; set; }
     [Required]
-    public int? ProjectId { get; set; }
+    public int ProjectId { get; set; }
     [JsonIgnore]
     public ProjectModel? Project { get; set; }
 

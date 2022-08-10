@@ -1,6 +1,7 @@
 ﻿using BusinessLogic.Interfaces;
 using BusinessLogic.Models;
 using DataAccess.Models;
+using DataAccess.QueriesModels;
 
 namespace BusinessLogic.Mappings
 {
@@ -41,6 +42,18 @@ namespace BusinessLogic.Mappings
                 Status = projectDto.Status,
                 Priority = projectDto.Priority,
                 ProjectTasks = projectDto.ProjectTasks != null ? ProjectTaskMappings.MapProjectTaskDtoCollectionToProjectTaskModelCollection(projectDto.ProjectTasks) : new List<ProjectTaskModel>()
+            };
+        }
+
+        public static ProjectParametersModel MapProjectFilteringParamsBlModelToProjectParametersDaModel(ProjectFilteringParamsModel project)
+        {
+            return new ProjectParametersModel
+            {
+                Name = project.Name,
+                StartDate = project.StartDate,
+                CompletionDate = project.CompletionDate,
+                Status = project.Status,
+                Priority = project.Priority
             };
         }
     }

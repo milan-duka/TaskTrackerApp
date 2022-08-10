@@ -9,5 +9,8 @@ public interface IProjectService
     Task<ProjectModel> GetProjectByIdAsync(int projectId);
     Task UpdateProjectAsync(int projectId, ProjectModel project);
     Task DeleteProjectAsync(int projectId);
+    Task<IEnumerable<ProjectModel>> GetAllProjectsByFiltersAsync(ProjectFilteringParamsModel filteringParams);
+    Task<IEnumerable<ProjectModel>> GetAllProjectsSortedByStartDateAsync();
+    Task<IEnumerable<ProjectModel>> GetAllProjectsSortedByPriorityAsync();
 }
 

@@ -12,6 +12,6 @@ public class ProjectDto
     public ProjectStatus Status { get; set; }
     public int Priority { get; set; }
 
-    public virtual ICollection<ProjectTaskDto>? ProjectTasks { get; set; }
+    public IList<ProjectTaskDto> ProjectTasks { get; } = new List<ProjectTaskDto>();
 }
 

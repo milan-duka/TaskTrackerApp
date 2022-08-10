@@ -12,11 +12,11 @@ public class TaskTrackerBaseController : ControllerBase
         var statusCode = e.Data.Keys.Cast<int>().Single();
 
         if (statusCode == 400)
-            return BadRequest(e.Message);
+            return BadRequest(e.Data[statusCode]);
         if (statusCode == 404)
-            return NotFound(e.Message);
+            return NotFound(e.Data[statusCode]);
 
-        return StatusCode(500, $"exception message: {e.Message}. Inner message: {(e.InnerException != null ? e.InnerException.Message : "/")}");
+        return StatusCode(500, $"Exception message: {e.Message}. Inner message: {(e.InnerException != null ? e.InnerException.Message : "/")}");
     }
 }
 

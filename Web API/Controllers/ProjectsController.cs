@@ -1,6 +1,7 @@
 ﻿using BusinessLogic.Interfaces;
 using BusinessLogic.Models;
 using Microsoft.AspNetCore.Mvc;
+using System.Globalization;
 
 namespace Web_API.Controllers;
 
@@ -39,12 +40,12 @@ public class ProjectsController : TaskTrackerBaseController
 
             return Ok(projects);
         }
-        catch (Exception e) 
+        catch (Exception e)
         {
             return ReturnStatusCodeWithExceptionMessage(e);
         }
     }
-    
+
     [HttpGet]
     [Route("allProjectsWithTasks")]
     public async Task<ActionResult<IEnumerable<ProjectWithTasksModel>>> GetAllProjectsWithTasksAsync()
@@ -70,7 +71,8 @@ public class ProjectsController : TaskTrackerBaseController
 
             return Ok(project);
 
-        }catch(Exception e)
+        }
+        catch (Exception e)
         {
             return ReturnStatusCodeWithExceptionMessage(e);
         }
@@ -86,7 +88,7 @@ public class ProjectsController : TaskTrackerBaseController
             return Ok("Project is successfully updated.");
 
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             return ReturnStatusCodeWithExceptionMessage(e);
         }
@@ -100,6 +102,55 @@ public class ProjectsController : TaskTrackerBaseController
             await _projectService.DeleteProjectAsync(id);
 
             return Ok("Project is successfully deleted.");
+        }
+        catch (Exception e)
+        {
+            return ReturnStatusCodeWithExceptionMessage(e);
+        }
+    }
+
+    [HttpPost]
+    [Route("allProjectsByFilters")]
+    public async Task<ActionResult<IEnumerable<ProjectWithTasksModel>>> GetAllProjectsByFiltersAsync(
+        [FromBody] ProjectFilteringParamsModel filteringParams)
+    {
+        try
+        {
+            var projects = await _projectService.GetAllProjectsByFiltersAsync(filteringParams);
+
+            return Ok(projects);
+        }
+        catch (Exception e)
+        {
+            return ReturnStatusCodeWithExceptionMessage(e);
+        }
+    }
+
+    [HttpGet]
+    [Route("allProjectsSortedByStartDate")]
+    public async Task<ActionResult<IEnumerable<ProjectWithTasksModel>>> GetAllProjectsSortedByStartDateAsync()
+    {
+        try
+        {
+            var projects = await _projectService.GetAllProjectsSortedByStartDateAsync();
+
+            return Ok(projects);
+        }
+        catch (Exception e)
+        {
+            return ReturnStatusCodeWithExceptionMessage(e);
+        }
+    }
+
+    [HttpGet]
+    [Route("allProjectsSortedByPriority")]
+    public async Task<ActionResult<IEnumerable<ProjectWithTasksModel>>> GetAllProjectsSortedByPriorityAsync()
+    {
+        try
+        {
+            var projects = await _projectService.GetAllProjectsSortedByPriorityAsync();
+
+            return Ok(projects);
         }
         catch (Exception e)
         {

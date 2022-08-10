@@ -1,6 +1,7 @@
 ﻿using DataAccess.Data;
 using DataAccess.Interfaces;
 using DataAccess.Models;
+using DataAccess.QueriesModels;
 using Microsoft.EntityFrameworkCore;
 
 namespace DataAccess.Repositories;
@@ -30,13 +31,11 @@ public class ProjectRepository : IProjectRepository
             .ToListAsync();
     }
 
-    public async Task<ProjectDto> GetProjectByIdAsync(int projectId)
+    public async Task<ProjectDto?> GetProjectByIdAsync(int projectId)
     {
-#pragma warning disable CS8603 // Possible null reference return.
         return await _taskTrackerContext.Projects
-            .FindAsync(projectId);
-#pragma warning restore CS8603 // Possible null reference return.
-
+            .Include(p => p.ProjectTasks)
+            .FirstOrDefaultAsync(p => p.Id == projectId);
     }
 
     public async Task UpdateProjectAsync(ProjectDto project)
@@ -50,6 +49,54 @@ public class ProjectRepository : IProjectRepository
     {
         _taskTrackerContext.Projects.Remove(project);
         await _taskTrackerContext.SaveChangesAsync();
+    }
+
+    public async Task<IEnumerable<ProjectDto>> GetAllProjectsByFiltersAsync(ProjectParametersModel paramsModel)
+    {
+        var query = _taskTrackerContext.Projects
+            .Include(p => p.ProjectTasks)
+            .AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(paramsModel.Name))
+            query = query.
+                Where(p => !string.IsNullOrEmpty(p.Name) && p.Name.Contains(paramsModel.Name));
+
+        if (paramsModel.StartDate.HasValue)
+            query = query
+            .Where(p => p.StartDate.HasValue
+                        && p.StartDate.Value.Date.Equals(paramsModel.StartDate.Value.Date));
+
+        if (paramsModel.CompletionDate.HasValue)
+            query = query
+            .Where(p => p.CompletionDate.HasValue
+                        && p.CompletionDate.Value.Date.Equals(paramsModel.CompletionDate.Value.Date));
+
+        if (paramsModel.Status.HasValue)
+            query = query
+                .Where(p => p.Status == paramsModel.Status.Value);
+
+        if (paramsModel.Priority.HasValue)
+            query = query
+                .Where(p => p.Priority == paramsModel.Priority.Value);
+
+        return await query.ToListAsync();
+    }
+
+    public async Task<IEnumerable<ProjectDto>> GetAllProjectsSortedByStartDateAsync()
+    {
+        return await _taskTrackerContext.Projects
+            .Include(p => p.ProjectTasks)
+            .OrderByDescending(p => p.StartDate.HasValue)
+            .ThenBy(p => p.StartDate)
+            .ToListAsync();
+    }
+
+    public async Task<IEnumerable<ProjectDto>> GetAllProjectsSortedByPriorityAsync()
+    {
+        return await _taskTrackerContext.Projects
+            .Include(p => p.ProjectTasks)
+            .OrderBy(p => p.Priority)
+            .ToListAsync();
     }
 
     public async Task<bool> ProjectExistsAsync(int projectId)

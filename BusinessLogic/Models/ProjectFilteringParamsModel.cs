@@ -2,14 +2,13 @@
 using System.ComponentModel.DataAnnotations;
 
 namespace BusinessLogic.Models;
-public class ProjectModel
+public class ProjectFilteringParamsModel
 {
-    [Required]
     public string? Name { get; set; }
     [DataType(DataType.Date)]
     public DateTime? StartDate { get; set; }
     [DataType(DataType.Date)]
     public DateTime? CompletionDate { get; set; }
-    public ProjectStatus Status { get; set; }
-    public int Priority { get; set; }
+    public ProjectStatus? Status { get; set; }
+    public int? Priority { get; set; }
 }

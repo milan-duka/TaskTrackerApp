@@ -20,14 +20,14 @@ public class ProjectTaskService : IProjectTaskService
 
     public async Task<int?> AddProjectTaskAsync(ProjectTaskModel projectTask)
     {
-        if (projectTask == null || !projectTask.ProjectId.HasValue)
+        if (projectTask == null)
             return null;
 
-        var projectDto = _projectRepository.GetProjectByIdAsync(projectTask.ProjectId.Value);
+        var projectDto = _projectRepository.GetProjectByIdAsync(projectTask.ProjectId);
 
         if (projectDto.Result == null)
             throw ExceptionHandlingHelper.ExceptionWithCustomCodeAndMessage(404,
-                $"Project task can't be added because related project with id {projectTask.ProjectId.Value} doesn't exist.");
+                $"Project task can't be added because related project with id {projectTask.ProjectId} doesn't exist.");
 
         var newProjectTaskDto = ProjectTaskMappings.MapProjectTaskBlModelToProjectTaskDto(projectTask);
 
@@ -89,15 +89,11 @@ public class ProjectTaskService : IProjectTaskService
             throw ExceptionHandlingHelper.ExceptionWithCustomCodeAndMessage(404,
                     $"Task with id {projectTaskId} can't be updated because it is not found.");
 
-        if (projectTask.ProjectId.HasValue)
-        {
-            var projectDto = _projectRepository.GetProjectByIdAsync(projectTask.ProjectId.Value);
+            var projectDto = _projectRepository.GetProjectByIdAsync(projectTask.ProjectId);
 
             if (projectDto.Result == null)
                 throw ExceptionHandlingHelper.ExceptionWithCustomCodeAndMessage(404,
-                $"Related project with id {projectTask.ProjectId.Value} doesn't exist so this project task can't be updated.");
-
-        }
+                $"Related project with id {projectTask.ProjectId} doesn't exist so this project task can't be updated.");
 
         var projectTaskDto = ProjectTaskMappings.MapProjectTaskBlModelToProjectTaskDto(projectTask);
         projectTaskDto.Id = projectTaskId;

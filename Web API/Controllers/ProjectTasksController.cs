@@ -39,7 +39,7 @@ public class ProjectTasksController : TaskTrackerBaseController
 
             return Ok(projectTasks);
         }
-        catch (Exception e) 
+        catch (Exception e)
         {
             return ReturnStatusCodeWithExceptionMessage(e);
         }
@@ -69,7 +69,8 @@ public class ProjectTasksController : TaskTrackerBaseController
 
             return Ok(projectTask);
 
-        }catch(Exception e)
+        }
+        catch (Exception e)
         {
             return ReturnStatusCodeWithExceptionMessage(e);
         }
@@ -84,7 +85,8 @@ public class ProjectTasksController : TaskTrackerBaseController
 
             return Ok("Project task successfully updated.");
 
-        }catch(Exception e)
+        }
+        catch (Exception e)
         {
             return ReturnStatusCodeWithExceptionMessage(e);
         }

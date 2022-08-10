@@ -3,6 +3,7 @@ using BusinessLogic.Interfaces;
 using BusinessLogic.Mappings;
 using BusinessLogic.Models;
 using DataAccess.Interfaces;
+using DataAccess.Models;
 
 namespace BusinessLogic.Services;
 public class ProjectService : IProjectService
@@ -63,7 +64,7 @@ public class ProjectService : IProjectService
             throw ExceptionHandlingHelper.ExceptionWithCustomCodeAndMessage(404,
             $"Project with Id: {projectId} not found!");
 
-        return ProjectMappings.MapProjectDtoToProjectBlModel(projectDto);
+        return ProjectMappings.MapProjectDtoWithTasksToProjectBlModelWithTasks(projectDto);
     }
 
     public async Task UpdateProjectAsync(int projectId, ProjectModel project)
@@ -89,5 +90,49 @@ public class ProjectService : IProjectService
                     $"Project with id {projectId} can't be deleted because it is not found.");
 
         await _projectRepository.DeleteProjectAsync(projectDto);
+    }
+
+    public async Task<IEnumerable<ProjectModel>> GetAllProjectsByFiltersAsync(ProjectFilteringParamsModel filteringParams)
+    {
+        var projectParametersDa = ProjectMappings.MapProjectFilteringParamsBlModelToProjectParametersDaModel(filteringParams);
+
+        var projectDtos = await _projectRepository.GetAllProjectsByFiltersAsync(projectParametersDa);
+
+        var projects = new List<ProjectWithTasksModel>();
+
+        foreach (var projectDto in projectDtos)
+        {
+            projects.Add(ProjectMappings.MapProjectDtoWithTasksToProjectBlModelWithTasks(projectDto));
+        }
+
+        return projects;
+    }
+
+    public async Task<IEnumerable<ProjectModel>> GetAllProjectsSortedByStartDateAsync()
+    {
+        var projectDtos = await _projectRepository.GetAllProjectsSortedByStartDateAsync();
+
+        var projects = new List<ProjectWithTasksModel>();
+
+        foreach (var projectDto in projectDtos)
+        {
+            projects.Add(ProjectMappings.MapProjectDtoWithTasksToProjectBlModelWithTasks(projectDto));
+        }
+
+        return projects;
+    }
+
+    public async Task<IEnumerable<ProjectModel>> GetAllProjectsSortedByPriorityAsync()
+    {
+        var projectDtos = await _projectRepository.GetAllProjectsSortedByPriorityAsync();
+
+        var projects = new List<ProjectWithTasksModel>();
+
+        foreach (var projectDto in projectDtos)
+        {
+            projects.Add(ProjectMappings.MapProjectDtoWithTasksToProjectBlModelWithTasks(projectDto));
+        }
+
+        return projects;
     }
 }
