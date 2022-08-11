@@ -1,7 +1,7 @@
 # TaskTrackerApp
 Web API application which provides manipulation and tracking data about projects and tasks.
 
-It is created using Visual Studio 2022, C#, .NET 6.0, Entity Framework Core 6.0 and MS Sql Server 13
+It is created using Visual Studio 2022, C#, .NET 6.0, Entity Framework Core 6.0, MS Sql Server 13 and Swagger
 
 Database is created and managed by code-first aproach using Entity Framework.
 If you want to download or clone this repository and try it in Visual Studio, after opening of TaskTrackerApp solution 
