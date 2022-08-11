@@ -9,9 +9,9 @@ it is enough to change connection string and to do update-database through NuGet
 After that database will be ready for app.
 
 Solution is separated in three projects:
-BusinessLogic
-DataAccess
-Web API (presentation)
+BusinessLogic,
+DataAccess,
+Web API (presentation).
 These layers are related using dependency injection.
 
 DataAccess - it is consisted from DTO models, context class, repositories, repository interfaces, queries models, enums and migrations.
