@@ -14,8 +14,10 @@ DataAccess
 Web API (presentation)
 These layers are related using dependency injection.
 
-DataAccess - it is consisted from DTO models, context class, repositories, repository interfaces, queries models, enums and migrations
-BusinessLogic - it is consisted from models, mappings between BLL models and DTO models, services for projects and project tasks, interfaces for services and helpers
+DataAccess - it is consisted from DTO models, context class, repositories, repository interfaces, queries models, enums and migrations.
+
+BusinessLogic - it is consisted from models, mappings between BLL models and DTO models, services for projects and project tasks, interfaces for services and helpers.
+
 Web API - contains controllers with endpoints, Program.cs entry point and all application setings related to development, deployment and similar.
 
 This Web API provides CRUD endpoints which allows requests:
@@ -92,6 +94,8 @@ requires body parameters as for an example:
   "priority": 0,
   "projectId": 0
 }
+
+ENDPOINTS FOR PROJECT TASKS
 
 GET - published on https://tasktrackerbymilanduka.azurewebsites.net/api/ProjectTasks/
 
