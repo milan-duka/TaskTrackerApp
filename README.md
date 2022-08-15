@@ -68,7 +68,7 @@ We can send this request by Postman and if everythig is ok it returns 200 code w
 If a project with required id doesn't exist it returns 404 code with message "Project with id: {id} doesn't exist."
 By this request also will be deleted all tasks related to deleting project by cascade.
 
-GET https://tasktrackerbymilanduka.azurewebsites.net/api/Projects/allProjectsByFilters
+POST https://tasktrackerbymilanduka.azurewebsites.net/api/Projects/allProjectsByFilters
 For this request we need to pass body parameters like in this example:
 {"startDate": "2022-08-10"}
 It filter projects by specific start date and returns only projects with that start date.
@@ -81,8 +81,12 @@ We can also use other filters like for an example:
   "priority": 0
 }
 
-GET https://tasktrackerbymilanduka.azurewebsites.net/api/Projects/allProjectsSortedByStartDate
-GET https://tasktrackerbymilanduka.azurewebsites.net/api/Projects/allProjectsSortedByPriority
+POST - published on https://tasktrackerbymilanduka.azurewebsites.net/api/Projects/allProjectsSorted
+requires body parameters as for an example:
+{
+  "sortBy": 1,
+  "descOrder": true
+}
 
 POST - published on https://tasktrackerbymilanduka.azurewebsites.net/api/ProjectTasks/
 requires body parameters as for an example:
