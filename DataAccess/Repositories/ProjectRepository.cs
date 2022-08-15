@@ -77,22 +77,78 @@ public class ProjectRepository : IProjectRepository
         return await query.ToListAsync();
     }
 
-    public async Task<IEnumerable<ProjectDto>> GetAllProjectsSortedByStartDateAsync()
+    public async Task<IEnumerable<ProjectDto>> GetAllProjectsSortedAsync(ProjectSortingParametersDaModel paramsModel)
     {
-        return await _taskTrackerContext.Projects
+        var query = _taskTrackerContext.Projects
             .Include(p => p.ProjectTasks)
-            .OrderByDescending(p => p.StartDate.HasValue)
-            .ThenBy(p => p.StartDate)
-            .ToListAsync();
+            .AsQueryable();
+
+        switch (paramsModel.SortBy)
+        {
+            case Enums.SortByOptions.Name:
+                {
+                    if(paramsModel.DescOrder)
+                    {
+                        query = query.OrderByDescending(p => p.Name);
+                        break;
+                    }
+
+                    query = query.OrderBy(p => p.Name);
+                }
+                break;
+            case Enums.SortByOptions.StartDate:
+                {
+                    if (paramsModel.DescOrder)
+                    {
+                        query = query.OrderByDescending(p => p.StartDate.HasValue)
+                        .ThenByDescending(p => p.StartDate);
+                        break;
+                    }
+
+                    query = query.OrderByDescending(p => p.StartDate.HasValue)
+                        .ThenBy(p => p.StartDate);
+                }
+                break;
+            case Enums.SortByOptions.CompletionDate:
+                {
+                    if (paramsModel.DescOrder)
+                    {
+                        query = query.OrderByDescending(p => p.CompletionDate.HasValue)
+                        .ThenByDescending(p => p.CompletionDate);
+                        break;
+                    }
+
+                    query = query.OrderByDescending(p => p.CompletionDate.HasValue)
+                        .ThenBy(p => p.CompletionDate);
+                }
+                break;
+            case Enums.SortByOptions.Status:
+                {
+                    if (paramsModel.DescOrder)
+                    {
+                        query = query.OrderByDescending(p => p.Status);
+                        break;
+                    }
+
+                    query = query.OrderBy(p => p.Status);
+                }
+                break;
+            case Enums.SortByOptions.Priority:
+                {
+                    if (paramsModel.DescOrder)
+                    {
+                        query = query.OrderByDescending(p => p.Priority);
+                        break;
+                    }
+
+                    query = query.OrderBy(p => p.Priority);
+                }
+                break;
+        }
+
+        return await query.ToListAsync();
     }
 
-    public async Task<IEnumerable<ProjectDto>> GetAllProjectsSortedByPriorityAsync()
-    {
-        return await _taskTrackerContext.Projects
-            .Include(p => p.ProjectTasks)
-            .OrderBy(p => p.Priority)
-            .ToListAsync();
-    }
 
     public async Task<bool> ProjectExistsAsync(int projectId)
     {

@@ -109,29 +109,14 @@ public class ProjectsController : TaskTrackerBaseController
         }
     }
 
-    [HttpGet]
-    [Route("allProjectsSortedByStartDate")]
-    public async Task<ActionResult<IEnumerable<ProjectWithTasksModel>>> GetAllProjectsSortedByStartDateAsync()
+    [HttpPost]
+    [Route("allProjectsSorted")]
+    public async Task<ActionResult<IEnumerable<ProjectWithTasksModel>>> GetAllProjectsSortedAsync(
+        [FromBody] ProjectSortingParamsModel sortingParams)
     {
         try
         {
-            var projects = await _projectService.GetAllProjectsSortedByStartDateAsync();
-
-            return Ok(projects);
-        }
-        catch (Exception e)
-        {
-            return ReturnStatusCodeWithExceptionMessage(e);
-        }
-    }
-
-    [HttpGet]
-    [Route("allProjectsSortedByPriority")]
-    public async Task<ActionResult<IEnumerable<ProjectWithTasksModel>>> GetAllProjectsSortedByPriorityAsync()
-    {
-        try
-        {
-            var projects = await _projectService.GetAllProjectsSortedByPriorityAsync();
+            var projects = await _projectService.GetAllProjectsSortedAsync(sortingParams);
 
             return Ok(projects);
         }

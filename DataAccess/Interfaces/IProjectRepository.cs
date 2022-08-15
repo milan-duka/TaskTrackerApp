@@ -10,7 +10,6 @@ public interface IProjectRepository
     Task UpdateProjectAsync(ProjectDto project);
     Task DeleteProjectAsync(ProjectDto project);
     Task<IEnumerable<ProjectDto>> GetAllProjectsByFiltersAsync(ProjectParametersModel paramsModel);
-    Task<IEnumerable<ProjectDto>> GetAllProjectsSortedByStartDateAsync();
-    Task<IEnumerable<ProjectDto>> GetAllProjectsSortedByPriorityAsync();
+    Task<IEnumerable<ProjectDto>> GetAllProjectsSortedAsync(ProjectSortingParametersDaModel paramsModel);
     Task<bool> ProjectExistsAsync(int projectId);
 }

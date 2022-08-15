@@ -56,5 +56,14 @@ namespace BusinessLogic.Mappings
                 Priority = project.Priority
             };
         }
+
+        public static ProjectSortingParametersDaModel MapProjectSortingParamsBlModelToProjectSortingParametersDaModel(ProjectSortingParamsModel projectSortingParams)
+        {
+            return new ProjectSortingParametersDaModel
+            {
+                SortBy = projectSortingParams.SortBy,
+                DescOrder = projectSortingParams.DescOrder
+            };
+        }
     }
 }

@@ -94,23 +94,10 @@ public class ProjectService : IProjectService
         return projects;
     }
 
-    public async Task<IEnumerable<ProjectModel>> GetAllProjectsSortedByStartDateAsync()
+    public async Task<IEnumerable<ProjectModel>> GetAllProjectsSortedAsync(ProjectSortingParamsModel sortingParams)
     {
-        var projectDtos = await _projectRepository.GetAllProjectsSortedByStartDateAsync();
-
-        var projects = new List<ProjectWithTasksModel>();
-
-        foreach (var projectDto in projectDtos)
-        {
-            projects.Add(ProjectMappings.MapProjectDtoWithTasksToProjectBlModelWithTasks(projectDto));
-        }
-
-        return projects;
-    }
-
-    public async Task<IEnumerable<ProjectModel>> GetAllProjectsSortedByPriorityAsync()
-    {
-        var projectDtos = await _projectRepository.GetAllProjectsSortedByPriorityAsync();
+        var sortingParamsDa = ProjectMappings.MapProjectSortingParamsBlModelToProjectSortingParametersDaModel(sortingParams);
+        var projectDtos = await _projectRepository.GetAllProjectsSortedAsync(sortingParamsDa);
 
         var projects = new List<ProjectWithTasksModel>();
 
