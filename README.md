@@ -1,5 +1,5 @@
 # TaskTrackerApp
-Web API application which provides manipulation and tracking data about projects and tasks.
+Web API application which provides entering, reading and updating data about projects and tasks.
 
 It is created using Visual Studio 2022, C#, .NET 6.0, Entity Framework Core 6.0, MS Sql Server 13 and Swagger
 
